@@ -1,0 +1,206 @@
+---
+title: "Assignment 3"
+author: Harish Kumar Uddandi
+output:
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+library(caret)
+library(e1071)
+library(tidyverse)
+library(dplyr)
+
+```
+
+
+
+Q1) Run the following code in R-studio to create two variables X and Y. 
+
+set.seed(2017) 
+X=runif(100)*10 
+Y=X*4+3.45 
+Y=rnorm(100)*0.29*Y+Y 
+
+a) Plot Y against X. Include a screenshot of the plot in your submission. Using the File menu you 
+can save the graph as a picture on your computer.  Based on the plot do you think we can fit a 
+linear model to explain Y based on X? 
+
+Answer:
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+set.seed(2017) 
+X=runif(100)*10 
+Y=X*4+3.45 
+Y=rnorm(100)*0.29*Y+Y 
+plot(X,Y)
+
+```
+Yes, it appears that a linear model might be fit.
+
+
+
+
+b) Construct a simple linear model of Y based on X. Write the equation that explains Y based on 
+X. What is the accuracy of this model? 
+
+
+```{r}
+
+
+accuracy <- lm(Y ~ X)
+summary(accuracy)
+
+```
+
+Here, the formula is Y=3.61*X+4.46.
+R2 in this instance is 0.65. This indicates that 65% of the variability is explained by the model.
+
+
+c)
+
+How  the  Coefficient  of  Determination,  R2,  of  the  model  above  is  related  to  the  correlation 
+coefficient of X and Y? 
+
+```{r}
+cor(X,Y)^2
+```
+
+Answer:
+We are reiterating the equality of the two values. so that means Coefficient of Determination = (Correlation Coefficient)^2
+
+
+2. We  will  use  the  ‘mtcars’  dataset  for  this  question.  The  dataset  is  already  included  in  your  R  
+distribution. The dataset shows some of the characteristics of different cars. The following shows 
+few samples (i.e. the first 6 rows) of the dataset.
+
+
+```{r}
+head(mtcars)
+```
+
+
+a) James wants to buy a car.  He and his friend, Chris, have different opinions about the Horse Power (hp) of cars. James think the weight of a car (wt) can be used to estimate the Horse Power of the car while Chris thinks the fuel consumption expressed in Mile Per Gallon (mpg), is a better estimator of the (hp). Who do you think is right? Construct simple linear models using mtcars data to answer the question. 
+
+```{r}
+summary(lm(mtcars$hp~mtcars$wt))
+```
+
+R^2 of the model based on the weight is 0.43
+
+```{r}
+summary(lm(mtcars$hp~mtcars$mpg))
+```
+
+R^2 of the model based on mpg is 0.60
+Therefore, it is more accurate model.So, Chris is right here.
+
+
+
+b) Build a model that uses the number of cylinders (cyl) and the mile per gallon (mpg) values of a car to predict the car
+Horse Power (hp). 
+
+
+```{r}
+summary(lm(mtcars$hp~mtcars$cyl+mtcars$mpg))
+
+
+```
+
+ The Equation  is  hp=23.979*cyl-2.775*mpg+54.067
+So therefore,
+For a car with 4 cyl and mpg=22, 
+hp=23.979*4-2.775*22+54.067=88.93
+
+The same can be done by using,
+
+```{r}
+Model= lm(hp~cyl+mpg, data=mtcars)
+predict(Model, newdata=data.frame(cyl=4, mpg=22))
+```
+
+
+3. For this question, we are going to use BostonHousing dataset. The dataset is in ‘mlbench’ package, so we first need to install the package, call the library and the load the dataset using the following commands
+
+
+install.packages('mlbench')
+```{r}
+library(mlbench) 
+data(BostonHousing) 
+```
+
+
+a) Build a model to estimate the median value of owner-occupied homes (medv)based on thefollowing  variables:  crime  crate  (crim),  proportion  of  residential  land  zoned  for  lots  over  25,000  sq.ft  (zn),  the  local  pupil-teacher  ratio  (ptratio)  and  weather  the  whether  the  tract  bounds Chas River(chas). Is this an accurate model? (Hint check R^2 )  
+
+```{r}
+
+set.seed(123)
+Modelestimate<-lm(medv~crim+zn+ptratio+chas,data = BostonHousing)
+summary(Modelestimate)
+
+```
+
+Here R^2 is 0.359, which is not very impressive. Therefore, the model is not precise enough.
+
+
+
+b) Use the estimated coefficient to answer these questions?   
+ 
+I. Imagine two houses that are identical in all aspects but one bounds the Chas River and the other does not. Which one is more expensive and by how much? 
+ 
+ 
+ 
+The coefficient chas1 is 4.5839
+In other words, if the variable is 1 rather than 0, we will add 4.5839 to the estimate of price. 
+That is $4,583.9 since the price is expressed in $1000(The median value of owner-occupied homes).
+So the house bounding the River is $4,583.9 more expensive.
+
+
+II. Imagine two houses that are identical in all aspects but in the neighborhood of one of them the pupil-teacher ratio is 15 and in the other one is 18. Which one is more expensive and by how much?
+
+ 
+
+The ptratio coefficient is 1.493. Therefore, there will be a 1.493 unit fall in the price of the neighborhood's properties, or 1493 in thousands of dollars, for every unit rise in the pupil-teacher ratio (i.e., fewer teachers and more crowded classrooms in schools).
+
+(18*1493= 26874) 
+(15*1493=22395)
+Substracting these we get $4479
+
+Therefore, the home with a pupil-teacher ratio of 18 is less expensive ($4479) than the nearby home with a pupil-teacher ratio of 15.
+A 15 student-teacher ratio is therefore more expensive.
+
+
+
+c) Which of the variables are statistically important (i.e. related to the house price)? Hint: use the p-values of the coefficients to answer.
+
+Answer:
+
+
+The p-values of all coefficients are very small.Therefore, all four variables are statistically significant and are related to the home price.
+
+
+d) Use the anova analysis and determine the order of importance of these four variables.
+
+
+
+```{r}
+anova(Modelestimate)
+```
+
+Answer: 
+Variables with higher Sum Square are more important.(Here crim variable) 
+The order of significance in this model 
+1. crim 
+2. ptratio 
+3.  Zn and 
+4. chas 
+
